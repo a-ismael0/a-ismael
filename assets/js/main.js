@@ -1,25 +1,49 @@
-/* tiny smooth-scroll for internal links */
+// Smooth scrolling for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
+  anchor.addEventListener('click', function(e) {
     e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
+    const targetId = this.getAttribute('href');
+    const target = document.querySelector(targetId);
+    
     if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Scroll to target
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+      
+      // Update URL without page reload
+      if (targetId !== '#') {
+        history.pushState(null, null, targetId);
+      } else {
+        history.pushState(null, null, ' ');
+      }
     }
   });
 });
 
-document.addEventListener("DOMContentLoaded", function () {
+// Handle back/forward navigation
+window.addEventListener('popstate', function() {
+  const hash = window.location.hash;
+  if (hash) {
+    const target = document.querySelector(hash);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+});
+
+// Your existing accordion code
+document.addEventListener("DOMContentLoaded", function() {
   const toggleButtons = document.querySelectorAll(".accordion-toggle");
 
   toggleButtons.forEach(btn => {
-    btn.addEventListener("click", function () {
+    btn.addEventListener("click", function() {
       const panel = this.nextElementSibling;
       const label = this.querySelector(".label-text");
 
       panel.classList.toggle("open");
 
-      // Only update label text if label element exists
       if (label) {
         const isOpen = panel.classList.contains("open");
         label.textContent = isOpen
